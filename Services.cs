@@ -8,22 +8,16 @@ namespace SQLEFTask
         {
             public List<CustomerViewModel> GetCustomers(DatabaseContext context, DateTime beginDate, int sumAmount)
             {
-                var customersWithTotalAmount = context.Orders
-                .Where(o => o.Date >= beginDate)
-                .GroupBy(o => o.CustomerID)
-                .Select(g => new
-                {
-                    CustomerID = g.Key,
-                    TotalAmount = g.Sum(o => o.Amount)
-                })
-                .Where(total => total.TotalAmount > sumAmount)
-                .Join(context.Customers, total => total.CustomerID, c => c.ID, (total, c) => new CustomerViewModel
-                {
-                    CustomerName = c.Name,
-                    ManagerName = c.Manager.Name,
-                    Amount = total.TotalAmount
-                })
-                .ToList();
+                var customersWithTotalAmount = context.Customers
+                    .Select(c => new CustomerViewModel
+                    {
+                        CustomerName = c.Name,
+                        ManagerName = c.Manager.Name,
+                        Amount = c.Orders
+                        .Where(o => o.Date >= beginDate)
+                        .Sum(o => o.Amount)
+                    })
+                    .Where(o => o.Amount > sumAmount).ToList();
 
                 return customersWithTotalAmount;
             }
