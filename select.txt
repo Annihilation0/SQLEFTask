@@ -1,5 +1,7 @@
-select customers.name, sum(orders.amount) as sumAmount 
-from customers join orders on orders.customerID = customers.ID 
-where orders.date >= '2023-01-01'
-GROUP BY  customers.name
+SELECT customers.name as customerName, managers.name as managerName, SUM(orders.amount) as sumAmount 
+FROM customers
+JOIN managers on managers.id = customers.managerID
+JOIN orders on orders.customerID = customers.ID 
+WHERE orders.date >= '2023-01-01'
+GROUP BY customerName, managerName
 HAVING sumAmount > 1000
